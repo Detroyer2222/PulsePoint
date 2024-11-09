@@ -1,22 +1,20 @@
-import type { Actions, PageServerLoad } from './$types';
 import { error, redirect } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async () => {
     return {};
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-    register: async ({ locals, request }) => {
+    resetPassword: async ({ request, locals}) => {
         const formData = await request.formData();
-        const username = formData.get('username') as string;
         const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
-        const passwordConfirm = formData.get('passwordConfirm') as string;
-        
+
         try {
-            await locals.pb.collection('users').create({ username, email, password, passwordConfirm });
-            await locals.pb.collection('users').requestVerification(email);
-            //TODO: add toast for more user feedback
+            await locals.pb.collection('users').requestPasswordReset(email);
+            return {
+                success: true,
+            }
         } catch (err) {
             if (err instanceof Error) {
                 console.log(err.message);
@@ -26,6 +24,6 @@ export const actions: Actions = {
                 throw error(500, 'Something went wrong');
             }
         }
-        throw redirect(303, '/login')
+        throw redirect(303, '/home')
     }
 };
