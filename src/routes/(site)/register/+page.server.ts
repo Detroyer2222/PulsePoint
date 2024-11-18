@@ -1,5 +1,7 @@
+import { registerSchema } from '$lib/schemas';
+import { validateData } from '$lib/utils';
 import type { Actions, PageServerLoad } from './$types';
-import { error, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 
 export const load = (async () => {
     return {};
@@ -7,24 +9,26 @@ export const load = (async () => {
 
 export const actions: Actions = {
     register: async ({ locals, request }) => {
-        const formData = await request.formData();
-        const username = formData.get('username') as string;
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
-        const passwordConfirm = formData.get('passwordConfirm') as string;
-        
+        const { formData, errors } = await validateData(await request.formData(), registerSchema)
+
+        if (errors) {
+            return fail(400, {
+                data: formData,
+                errors: errors.fieldErrors
+            })
+        }
+        const username = formData.username;
+        const email = formData.email;
+        const password = formData.password;
+        const passwordConfirm = formData.passwordConfirm;
+
         try {
             await locals.pb.collection('users').create({ username, email, password, passwordConfirm });
             await locals.pb.collection('users').requestVerification(email);
             //TODO: add toast for more user feedback
         } catch (err) {
-            if (err instanceof Error) {
-                console.log(err.message);
-                throw error(500, 'Something went wrong');
-            } else {
-                console.log('Unknown error', err);
-                throw error(500, 'Something went wrong');
-            }
+            console.log(err);
+            throw error(500, 'Something went wrong');
         }
         throw redirect(303, '/login')
     }

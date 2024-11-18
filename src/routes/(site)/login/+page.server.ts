@@ -1,5 +1,7 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { validateData } from '$lib/utils';
+import { loginSchema } from '$lib/schemas';
 
 export const load = (async () => {
     return {};
@@ -7,14 +9,17 @@ export const load = (async () => {
 
 export const actions: Actions = {
     login: async ({ locals, request }) => {
-        const formData = await request.formData();
-        const email = formData.get('email') as string;
-        const password = formData.get('password') as string;
-        console.log('email', email);
-        console.log('password', password);
+        const { formData, errors} = await validateData(await request.formData(), loginSchema)
+        
+        if (errors) {
+            return fail(400, {
+                data: formData,
+                errors: errors.fieldErrors
+            })
+        }
 
         try {
-            await locals.pb.collection('users').authWithPassword(email, password);
+            await locals.pb.collection('users').authWithPassword(formData.email, formData.password);
             if (!locals.pb.authStore.isValid) {
                 locals.pb.authStore.clear();
                 return {
@@ -22,13 +27,8 @@ export const actions: Actions = {
                 }
             }
         } catch (err) {
-            if (err instanceof Error) {
-                console.log(err.message);
-                throw error(500, 'Something went wrong');
-            } else {
-                console.log('Unknown error', err);
-                throw error(500, 'Something went wrong');
-            }
+            const svelteError = err as { status: number; message: string };
+            throw error(svelteError.status, svelteError.message)
         }
         throw redirect(303, '/app')
     }

@@ -1,15 +1,20 @@
 import PocketBase from 'pocketbase'
-import { SECRET_POCKETBASE_URL } from '$env/static/private'
+import { PUBLIC_POCKETBASE_URL } from '$env/static/public'
 import type { Handle } from '@sveltejs/kit';
 
 export const handle: Handle = async ({ event, resolve }) => {
-    event.locals.pb = new PocketBase('https://dev.pulsepoint.pocketbase.detroyerlabs.com');
+    event.locals.pb = new PocketBase(PUBLIC_POCKETBASE_URL);
 
     event.locals.pb.authStore.loadFromCookie(event.request.headers.get('cookie') || '');
 
-    if (event.locals.pb.authStore.isValid) {
-        event.locals.user = structuredClone(event.locals.pb.authStore.record)
-    } else {
+    try {
+        if (event.locals.pb.authStore.isValid) {
+            event.locals.pb.collection('users').authRefresh();
+            event.locals.user = structuredClone(event.locals.pb.authStore.record)
+        }
+        
+    } catch (_) {
+        event.locals.pb.authStore.clear();
         event.locals.user = null;
     }
 

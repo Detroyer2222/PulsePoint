@@ -1,6 +1,6 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 
-import PocketBase, { type AuthModel } from "pocketbase";
+import PocketBase, { type AuthModel, type AuthRecord } from "pocketbase";
 
 // for information about these interfaces
 declare global {
@@ -8,7 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			pb:PocketBase,
-			user:AuthModel
+			user:AuthRecord
 		}
 		// interface PageData {}
 		// interface PageState {}

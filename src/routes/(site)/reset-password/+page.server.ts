@@ -6,7 +6,7 @@ export const load = (async () => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-    resetPassword: async ({ request, locals}) => {
+    resetPassword: async ({ request, locals }) => {
         const formData = await request.formData();
         const email = formData.get('email') as string;
 
@@ -16,13 +16,8 @@ export const actions: Actions = {
                 success: true,
             }
         } catch (err) {
-            if (err instanceof Error) {
-                console.log(err.message);
-                throw error(500, 'Something went wrong');
-            } else {
-                console.log('Unknown error', err);
-                throw error(500, 'Something went wrong');
-            }
+            console.log(err);
+            throw error(500, 'Something went wrong');
         }
         throw redirect(303, '/home')
     }
