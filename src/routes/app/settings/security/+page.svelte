@@ -3,7 +3,7 @@
 	import { Heading, Hr, Label, Button, Input, Alert, Modal } from 'flowbite-svelte';
 	import { InfoCircleSolid, EyeOutline, EyeSlashOutline } from 'flowbite-svelte-icons';
 	import type { ActionData, PageData } from './$types';
-	import InputSvelte from '$lib/components/Input.svelte';
+	import AppInput from '$lib/components/Input.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	$inspect(data, form);
@@ -15,10 +15,6 @@
 	});
 
 	let emailModalOpen = $state(false);
-
-	let showOldPassword = $state(false);
-	let showNewPassword = $state(false);
-	let showConfirmPassword = $state(false);
 </script>
 
 <div class="w-full-h-full flex flex-col space-y-6">
@@ -26,7 +22,7 @@
 	<Hr />
 
 	<div class="flex w-3/5 flex-col space-y-5">
-		<InputSvelte
+		<AppInput
 			type="email"
 			label="Email"
 			name="email"
@@ -51,7 +47,7 @@
 			title="Change your Email"
 		>
 			<form class="flex flex-col space-y-6" action="?/updateEmail" method="post" use:enhance>
-				<InputSvelte
+				<AppInput
 					type="email"
 					label="Email"
 					name="email"
@@ -66,27 +62,29 @@
 		<Heading tag="h3" class="mt-5 font-medium">Change Password</Heading>
 		<Hr />
 		<form class="flex flex-col space-y-6" action="?/updatePassword" method="post" use:enhance>
-
-			<InputSvelte
+			<AppInput
 				type="password"
 				label="Old Password"
 				name="oldPassword"
 				placeholder="•••••"
-				errors={form?.errors?.oldPassword} />
-			
-			<InputSvelte
-				type=password
+				errors={form?.errors?.oldPassword}
+			/>
+
+			<AppInput
+				type="password"
 				label="New Password"
 				name="password"
 				placeholder="•••••"
-				errors={form?.errors?.password} />
+				errors={form?.errors?.password}
+			/>
 
-			<InputSvelte
+			<AppInput
 				type="password"
 				label="Confirm New Password"
 				name="passwordConfirm"
 				placeholder="•••••"
-				errors={form?.errors?.passwordConfirm} />
+				errors={form?.errors?.passwordConfirm}
+			/>
 
 			<Button type="submit">Request Password Change</Button>
 		</form>

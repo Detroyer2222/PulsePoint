@@ -107,3 +107,60 @@ export const updateProfileSchema = z.object({
             }
         })
 });
+
+export const createOrganizationSchema = z.object({
+    name: z
+        .string({ required_error: 'Organization name is required' })
+        .min(3, { message: 'Organization name must be at least 3 characters long.' })
+        .max(64, { message: 'Organization name must be less than 64 characters.' })
+        .trim(),
+    description: z
+        .string()
+        .max(255, { message: 'Description must be less than 255 characters.' })
+        .trim()
+        .optional(),
+    logo: z
+        .instanceof(Blob)
+        .optional()
+        .superRefine((value, ctx) => {
+            if (value) {
+                if (value.size > 5242880) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'File size must be less than 5MB',
+                        path: ['avatar']
+                    });
+                }
+            }
+        })
+});
+
+export const updateOrganizationSchema = z.object({
+    description: z
+        .string()
+        .max(255, { message: 'Description must be less than 255 characters.' })
+        .trim()
+        .optional(),
+    logo: z
+        .instanceof(Blob)
+        .optional()
+        .superRefine((value, ctx) => {
+            if (value) {
+                if (value.size > 5242880) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'File size must be less than 5MB',
+                        path: ['avatar']
+                    });
+                }
+            }
+        })
+});
+
+export const removeUserFromOrganizationSchema = z.object({
+    userId: z.string({ required_error: 'User ID is required' }),
+});
+
+export const addMembersSchema = z.object({
+    usernames: z.string({ required_error: 'Usernames are required' }),
+});

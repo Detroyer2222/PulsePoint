@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { Button, Card, Alert } from 'flowbite-svelte';
 	import { InfoCircleSolid } from 'flowbite-svelte-icons';
-	import InputSvelte from '$lib/components/Input.svelte';
+	import AppInput from '$lib/components/Input.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let { form, data }: { form: ActionData; data: PageData } = $props();
@@ -29,20 +29,22 @@
 						case 'failure':
 							toast.error('Invalid email or password');
 							await update();
+							loading = false;
 							break;
 						case 'error':
 							toast.error(result.error.message);
+							loading = false;
 							break;
 						default:
 							await update();
-
 							loading = false;
+							break;
 					}
 				};
 			}}
 		>
 			<h3 class="text-xl font-medium text-gray-900 dark:text-white">Login</h3>
-			<InputSvelte
+			<AppInput
 				type="email"
 				label="Email"
 				name="email"
@@ -52,7 +54,7 @@
 				errors={form?.errors?.email}
 				disabled={loading}
 			/>
-			<InputSvelte
+			<AppInput
 				type="password"
 				label="Password"
 				name="password"

@@ -1,6 +1,8 @@
 import { PUBLIC_POCKETBASE_URL } from "$env/static/public";
-import type { ZodError, ZodObject, ZodSchema } from "zod";
-import type { ActionData } from "../routes/$types";
+import type { ZodSchema } from "zod";
+import PocketBase from "pocketbase";
+import type { Organization } from "./pulepointTypes";
+import { error } from "@sveltejs/kit";
 
 export const validateData = async (formData: FormData, schema: ZodSchema) => {
     const body = Object.fromEntries(formData);
@@ -23,7 +25,7 @@ export const validateData = async (formData: FormData, schema: ZodSchema) => {
     }
 }
 
-export const toggleTheme = (isDarkMode:boolean) => {
+export const toggleTheme = (isDarkMode: boolean) => {
     if (isDarkMode) {
         document.documentElement.classList.add('dark');
         localStorage.setItem('color-theme', 'dark');
@@ -36,4 +38,24 @@ export const toggleTheme = (isDarkMode:boolean) => {
 
 export const getImageUrlFromPocketBase = (collectionId: string, recordId: string, filename: string, size = '0x0'): string => {
     return `${PUBLIC_POCKETBASE_URL}/api/files/${collectionId}/${recordId}/${filename}?thumb=${size}`;
+}
+
+export const findUserOrganization = async (userId: string, pb: PocketBase): Promise<Organization | null> => {
+    try {
+        const organizations = await pb.collection('organizations').getFullList({
+            filter: `members.id ?= "${userId}"`,
+            //expand: 'members'
+        });
+
+        if (!organizations) {
+            return null;
+        }
+
+        return organizations[0] as unknown as Organization;
+    } catch (err) {
+        console.log(err);
+        // @ts-ignore
+        throw error(500, err.message);
+    }
+
 }

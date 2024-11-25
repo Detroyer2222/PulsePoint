@@ -17,9 +17,10 @@
 	import { getImageUrlFromPocketBase } from '$lib/utils';
 	import { invalidateAll } from '$app/navigation';
 	import { InfoCircleSolid } from 'flowbite-svelte-icons';
+	import { toast } from 'svelte-sonner';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
-    $inspect(data, form);
+	$inspect(data, form);
 
 	let avatarUrl = $state(data.user?.avatar);
 	let loading = $state(false);
@@ -29,9 +30,11 @@
 		return async ({ result }) => {
 			switch (result.type) {
 				case 'success':
+					toast.success('Profile updated successfully');
 					await invalidateAll();
 					break;
 				case 'error':
+					toast.error('An error occurred while updating your profile');
 					break;
 				default:
 					await applyAction(result);
@@ -41,11 +44,11 @@
 	};
 
 	let userNameModalOpen = $state(false);
-    $effect(() => {
-        if (form?.success) {
-            userNameModalOpen = false;
-        }
-    });
+	$effect(() => {
+		if (form?.success) {
+			userNameModalOpen = false;
+		}
+	});
 </script>
 
 <div class="w-full-h-full flex flex-col space-y-6">
@@ -81,7 +84,7 @@
 				<Label for="avatar" class="pb-2">Upload picture</Label>
 				<Fileupload id="avatar" name="avatar" accept="image/*" class="w-full" disabled={loading}
 				></Fileupload>
-				<Helper>SVG, PNG, JPG</Helper>
+				<Helper class="mt-2">SVG, PNG, JPG (144x144px)</Helper>
 			</div>
 		</div>
 
@@ -115,7 +118,7 @@
 				<span class="font-medium">Your Username has been changed!</span>
 			</Alert>
 		{/if}
-        <Button onclick={() => (userNameModalOpen = true)}>Change Username</Button>
+		<Button onclick={() => (userNameModalOpen = true)}>Change Username</Button>
 
 		<Modal
 			bind:open={userNameModalOpen}
@@ -123,7 +126,6 @@
 			autoclose={false}
 			class=""
 			title="Change your Username"
-            
 		>
 			<form class="flex flex-col space-y-6" action="?/updateUsername" method="post" use:enhance>
 				<Label class="space-y-2">
