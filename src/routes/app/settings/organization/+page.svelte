@@ -562,8 +562,10 @@
 		</Tabs>
 	</div>
 	{#if data.organization.owner === data.user?.id}
-		<Heading tag="h3" class="mt-5 font-medium" color="red">Danger Zone</Heading>
-		<Hr color="red" />
+		<Heading tag="h3" class="mt-5 font-medium" color="text-red-700 dark:text-red-500"
+			>Danger Zone</Heading
+		>
+		<Hr color="text-red-700 dark:text-red-500" />
 		<form
 			action="?/deleteOrganization"
 			method="post"
