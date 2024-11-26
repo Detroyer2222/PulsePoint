@@ -164,3 +164,7 @@ export const removeUserFromOrganizationSchema = z.object({
 export const addMembersSchema = z.object({
     usernames: z.string({ required_error: 'Usernames are required' }),
 });
+
+export const addAdminsSchema = z.object({
+    selectedUsers: z.string({ required_error: 'User IDs are required' }),
+});

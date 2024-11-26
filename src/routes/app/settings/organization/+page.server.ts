@@ -1,7 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { validateData } from '$lib/utils';
-import { addMembersSchema, createOrganizationSchema, removeUserFromOrganizationSchema, updateOrganizationSchema } from '$lib/schemas';
+import { addAdminsSchema, addMembersSchema, createOrganizationSchema, removeUserFromOrganizationSchema, updateOrganizationSchema } from '$lib/schemas';
 
 
 export const load = (async ({ locals }) => {
@@ -104,6 +104,16 @@ export const actions: Actions = {
         }
 
         try {
+            if (formData.userId === locals.organization.owner) {
+                return fail(400, {
+                    data: formData,
+                    errors: {
+                        userId: 'Owner cannot be removed from organization.'
+                    },
+                    isOwner: true
+                });
+            }
+
             const organization = await locals.pb.collection('organizations').update(locals.organization.id, {
                 'members-': [formData.userId]
             }, {
@@ -134,6 +144,16 @@ export const actions: Actions = {
         }
 
         try {
+            if (formData.userId === locals.organization.owner) {
+                return fail(400, {
+                    data: formData,
+                    errors: {
+                        userId: 'Owner cannot be removed from organization.'
+                    },
+                    isOwner: true
+                });
+            }
+
             const organizationAdmins = await locals.pb.collection('organizations').update(locals.organization.id, {
                 'admins-': [formData.userId]
             }, {
@@ -164,7 +184,7 @@ export const actions: Actions = {
             });
         }
 
-        const usernames = formData.usernames.replace(/ /g, '').split(';');
+        const usernames = formData.usernames.replace(/ /g, '').split(',');
         const newMembers: string[] = [];
 
         for (const username of usernames) {
@@ -204,4 +224,37 @@ export const actions: Actions = {
 
         return { success: true };
     },
+    addAdmins: async ({ locals, request }) => {
+        const { formData, errors } = await validateData(await request.formData(), addAdminsSchema);
+        console.log('adding admins', errors, formData);
+
+        if (errors) {
+            return fail(400, {
+                data: formData,
+                errors: errors.fieldErrors,
+            });
+        }
+
+        try {
+            const selectedUsers = JSON.parse(formData.selectedUsers);
+            console.log('parsed', selectedUsers);
+            const organizationAdmins = await locals.pb.collection('organizations').update(locals.organization.id, {
+                'admins+': selectedUsers,
+                expand: 'members,admins,owner',
+            });
+
+            if (organizationAdmins.expand) {
+                locals.organization = organizationAdmins;
+
+                return {
+                    success: true
+                }
+            }
+        } catch (err) {
+            console.error('Error updating organization admins:', err);
+            throw error(500, 'Failed to add admins to organization.');
+        }
+
+        return { success: true };
+    }
 };
