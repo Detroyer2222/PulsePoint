@@ -17,6 +17,7 @@ export const load = (async ({ locals }) => {
         });
         if (organizationExpanded.expand) {
             locals.organization.expand = organizationExpanded.expand;
+            console.log('organization members', locals.organization.expand.members);
             return {
                 organization: locals.organization
             }
@@ -189,6 +190,7 @@ export const actions: Actions = {
 
         for (const username of usernames) {
             try {
+                console.log('fetching user', username);
                 const user = await locals.pb.collection('users').getFirstListItem(`username="${username}"`, {
                     fields: 'username,id',
                 });

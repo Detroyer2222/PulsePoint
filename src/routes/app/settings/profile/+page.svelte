@@ -18,6 +18,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { InfoCircleSolid } from 'flowbite-svelte-icons';
 	import { toast } from 'svelte-sonner';
+	import AppInput from '$lib/components/Input.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	$inspect(data, form);
@@ -49,6 +50,16 @@
 			userNameModalOpen = false;
 		}
 	});
+
+	const showPreview = (event: Event) => {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) {
+			const src = URL.createObjectURL(file);
+			const avatar = document.getElementById('userAvatar') as HTMLImageElement;
+			avatar.src = src;
+		}
+	};
 </script>
 
 <div class="w-full-h-full flex flex-col space-y-6">
@@ -77,12 +88,19 @@
 							)
 						: ''}
 					size="xl"
+					id="userAvatar"
 				></Avatar>
 			</div>
 
 			<div class="w-2/5 self-end">
 				<Label for="avatar" class="pb-2">Upload picture</Label>
-				<Fileupload id="avatar" name="avatar" accept="image/*" class="w-full" disabled={loading}
+				<Fileupload
+					id="avatar"
+					name="avatar"
+					accept="image/*"
+					class="w-full"
+					disabled={loading}
+					onchange={showPreview}
 				></Fileupload>
 				<Helper class="mt-2">SVG, PNG, JPG (144x144px)</Helper>
 			</div>
@@ -103,19 +121,13 @@
 	<div class="flex w-3/5 flex-col space-y-5">
 		<Label>
 			<span class="label-text">Username</span>
-			<Input type="text" name="username" value={data.user?.username} disabled={loading} />
+			<Input type="text" name="username" value={data.user?.username} disabled />
 		</Label>
 		{#if form?.usernameExists}
 			<Alert color="red">
 				<InfoCircleSolid slot="icon" class="h-5 w-5" />
 				<span class="font-medium">Username already exists!</span>
 				Please choose a different name and try again.
-			</Alert>
-		{/if}
-		{#if form?.usernameChange}
-			<Alert color="green">
-				<InfoCircleSolid slot="icon" class="h-5 w-5" />
-				<span class="font-medium">Your Username has been changed!</span>
 			</Alert>
 		{/if}
 		<Button onclick={() => (userNameModalOpen = true)}>Change Username</Button>
@@ -127,7 +139,23 @@
 			class=""
 			title="Change your Username"
 		>
-			<form class="flex flex-col space-y-6" action="?/updateUsername" method="post" use:enhance>
+			<form
+				class="flex flex-col space-y-6"
+				action="?/updateUsername"
+				method="post"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						switch (result.type) {
+							case 'success':
+								toast.success('Username updated successfully');
+								await update();
+								break;
+							default:
+								await applyAction(result);
+						}
+					};
+				}}
+			>
 				<Label class="space-y-2">
 					<span>Enter your new Username</span>
 					<Input type="text" name="username" placeholder="name" required />

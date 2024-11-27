@@ -15,7 +15,6 @@
 	let activeUrl = $derived($page.url.pathname.split('/').at(-1));
 
 	let { children, data }: { children: Snippet<[]>; data: LayoutData } = $props();
-	$inspect(pathname, activeUrl, data.user, data.organization);
 </script>
 
 <div class="flex h-full w-full px-2">

@@ -13,7 +13,6 @@ declare global {
 			organization: RecordModel<Organization>
 		}
 		interface PageData {
-			organization: RecordModel<Organization>
 		}
 		// interface PageState {}
 		// interface Platform {}
