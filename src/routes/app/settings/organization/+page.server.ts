@@ -2,6 +2,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { validateData } from '$lib/utils';
 import { addAdminsSchema, addMembersSchema, createOrganizationSchema, removeUserFromOrganizationSchema, updateOrganizationSchema } from '$lib/schemas';
+import type { Organization } from '$lib/pulsepointTypes';
 
 
 export const load = (async ({ locals }) => {
@@ -44,7 +45,7 @@ export const actions: Actions = {
             if (!locals.user) {
                 throw error(401, 'Unauthorized');
             }
-            const organization = await locals.pb.collection('organizations').create({ ...formData, owner: [locals.user.id], members: [locals.user.id] });
+            const organization = await locals.pb.collection<Organization>('organizations').create({ ...formData, owner: [locals.user.id], members: [locals.user.id] });
 
             if (organization) {
                 locals.organization = organization;
@@ -76,7 +77,7 @@ export const actions: Actions = {
             if (!locals.user) {
                 throw error(401, 'Unauthorized');
             }
-            const organization = await locals.pb.collection('organizations').update(locals.organization.id, formData);
+            const organization = await locals.pb.collection<Organization>('organizations').update(locals.organization.id, formData);
 
             if (organization) {
                 locals.organization = organization;
@@ -115,7 +116,7 @@ export const actions: Actions = {
                 });
             }
 
-            const organization = await locals.pb.collection('organizations').update(locals.organization.id, {
+            const organization = await locals.pb.collection<Organization>('organizations').update(locals.organization.id, {
                 'members-': [formData.userId]
             }, {
                 expand: 'members,admins,owner',
@@ -155,7 +156,7 @@ export const actions: Actions = {
                 });
             }
 
-            const organizationAdmins = await locals.pb.collection('organizations').update(locals.organization.id, {
+            const organizationAdmins = await locals.pb.collection<Organization>('organizations').update(locals.organization.id, {
                 'admins-': [formData.userId]
             }, {
                 expand: 'members,admins,owner',
@@ -206,7 +207,7 @@ export const actions: Actions = {
 
 
         try {
-            const organizationMembers = await locals.pb.collection('organizations').update(locals.organization.id, {
+            const organizationMembers = await locals.pb.collection<Organization>('organizations').update(locals.organization.id, {
                 'members+': newMembers,
                 expand: 'members,admins,owner',
             });
@@ -240,7 +241,7 @@ export const actions: Actions = {
         try {
             const selectedUsers = JSON.parse(formData.selectedUsers);
             console.log('parsed', selectedUsers);
-            const organizationAdmins = await locals.pb.collection('organizations').update(locals.organization.id, {
+            const organizationAdmins = await locals.pb.collection<Organization>('organizations').update(locals.organization.id, {
                 'admins+': selectedUsers,
                 expand: 'members,admins,owner',
             });

@@ -1,7 +1,7 @@
 import { PUBLIC_POCKETBASE_URL } from "$env/static/public";
 import type { ZodSchema } from "zod";
 import PocketBase from "pocketbase";
-import type { Organization } from "./pulepointTypes";
+import type { Organization } from "./pulsepointTypes";
 import { error } from "@sveltejs/kit";
 
 export const validateData = async (formData: FormData, schema: ZodSchema) => {
@@ -42,7 +42,7 @@ export const getImageUrlFromPocketBase = (collectionId: string, recordId: string
 
 export const findUserOrganization = async (userId: string, pb: PocketBase): Promise<Organization | null> => {
     try {
-        const organizations = await pb.collection('organizations').getFullList({
+        const organizations = await pb.collection<Organization>('organizations').getFullList({
             filter: `members.id ?= "${userId}"`,
             //expand: 'members'
         });
@@ -51,7 +51,7 @@ export const findUserOrganization = async (userId: string, pb: PocketBase): Prom
             return null;
         }
 
-        return organizations[0] as unknown as Organization;
+        return organizations[0] as Organization;
     } catch (err) {
         console.log(err);
         // @ts-ignore
