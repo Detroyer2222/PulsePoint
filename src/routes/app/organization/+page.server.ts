@@ -24,6 +24,7 @@ export const load = (async ({ locals, url }) => {
         organization: locals.organization,
         outposts: outposts,
         starSystems: starSystems,
+        token: locals.pb.authStore.token,
     };
 }) satisfies PageServerLoad;
 

@@ -18,8 +18,6 @@
 	import type { ActionData, PageData } from './$types';
 	import { getImageUrlFromPocketBase } from '$lib/utils';
 	import AppInput from '$lib/components/Input.svelte';
-	import { goto, invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { applyAction, enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
 	import type { Moon, Planet } from '$lib/pulsepointTypes';
@@ -55,7 +53,13 @@
 			planets = planetsCache.get(selectedStarSystem) as Planet[];
 		} else {
 			const response = await fetch(
-				`${PUBLIC_POCKETBASE_URL}/api/collections/planets/records?filter=star_system="${selectedStarSystem}"&fields=id,name`
+				`${PUBLIC_POCKETBASE_URL}/api/collections/planets/records?filter=star_system="${selectedStarSystem}"&fields=id,name`,
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `${data.token}`
+					}
+				}
 			);
 			const json = await response.json();
 			planets = json.items as Planet[];
@@ -73,7 +77,13 @@
 			moons = moonsCache.get(selectedPlanet) as Moon[];
 		} else {
 			const response = await fetch(
-				`${PUBLIC_POCKETBASE_URL}/api/collections/moons/records?filter=planet="${selectedPlanet}"&fields=id,name`
+				`${PUBLIC_POCKETBASE_URL}/api/collections/moons/records?filter=planet="${selectedPlanet}"&fields=id,name`,
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `${data.token}`
+					}
+				}
 			);
 			const json = await response.json();
 			moons = json.items as Moon[];

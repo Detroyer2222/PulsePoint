@@ -2,6 +2,8 @@ import PocketBase from 'pocketbase'
 import { PUBLIC_POCKETBASE_URL } from '$env/static/public'
 import type { Handle } from '@sveltejs/kit';
 import { findUserOrganization } from '$lib/utils';
+import * as cookie from 'cookie';
+import { dev } from '$app/environment';
 
 export const handle: Handle = async ({ event, resolve }) => {
     event.locals.pb = new PocketBase(PUBLIC_POCKETBASE_URL);
@@ -28,7 +30,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     const response = await resolve(event);
 
-    response.headers.set('set-cookie', event.locals.pb.authStore.exportToCookie({ secure: false }));
+    response.headers.set('set-cookie', event.locals.pb.authStore.exportToCookie({ secure: dev ? false : true }));
 
     return response;
 }
