@@ -168,3 +168,56 @@ export const addMembersSchema = z.object({
 export const addAdminsSchema = z.object({
     selectedUsers: z.string({ required_error: 'User IDs are required' }),
 });
+
+export const addOutpostSchema = z.object({
+    name: z
+        .string({ required_error: 'Outpost name is required' })
+        .min(3, { message: 'Outpost name must be at least 3 characters long.' })
+        .max(64, { message: 'Outpost name must be less than 64 characters.' })
+        .trim(),
+    code: z
+        .string()
+        .min(2, { message: 'Outpost code must be at least 2 characters long.' })
+        .max(4, { message: 'Outpost code must be less than 4 characters.' })
+        .trim()
+        .optional()
+        .transform(value => (value || '').toUpperCase()),
+    description: z
+        .string()
+        .max(255, { message: 'Description must be less than 255 characters.' })
+        .trim()
+        .optional(),
+    image: z
+        .instanceof(Blob)
+        .optional()
+        .superRefine((value, ctx) => {
+            if (value) {
+                if (value.size > 5242880) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: 'File size must be less than 5MB',
+                        path: ['avatar']
+                    });
+                }
+            }
+        }),
+    starSystem: z.string({ required_error: 'Star System is required' }),
+    planet: z.string({ required_error: 'Planet is required' }),
+    moon: z.string().optional(),
+    lat: z
+        .number()
+        .min(-90, { message: "Latitude must be between -90 and 90" })
+        .max(90, { message: "Latitude must be between -90 and 90" })
+        .refine((val) => /^\-?\d+(\.\d{1,6})?$/.test(val.toFixed(6)), {
+            message: "Latitude must have at most 6 decimal places",
+        })
+        .optional(),
+    lng: z
+        .number()
+        .min(-180, { message: "Longitude must be between -180 and 180" })
+        .max(180, { message: "Longitude must be between -180 and 180" })
+        .refine((val) => /^\-?\d+(\.\d{1,6})?$/.test(val.toFixed(6)), {
+            message: "Longitude must have at most 6 decimal places",
+        })
+        .optional(),
+});

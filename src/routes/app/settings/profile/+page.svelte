@@ -75,7 +75,7 @@
 
 		<div class="flex flex-row space-x-4">
 			<div>
-				<Label for="avatar" class="pb-2">
+				<Label for="userAvatar" class="pb-2">
 					<span class="label-text">Profile Picture</span>
 				</Label>
 				<Avatar

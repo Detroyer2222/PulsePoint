@@ -13,6 +13,7 @@ declare global {
 			organization: Organization
 		}
 		interface PageData {
+			organization: Organization
 		}
 		// interface PageState {}
 		// interface Platform {}

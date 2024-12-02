@@ -5,14 +5,16 @@ import { addAdminsSchema, addMembersSchema, createOrganizationSchema, removeUser
 import type { Organization } from '$lib/pulsepointTypes';
 
 
-export const load = (async ({ locals }) => {
+export const load = (async ({ locals, depends }) => {
     if (!locals.pb.authStore.isValid) {
         throw redirect(303, '/login');
     }
 
+    depends('organization');
+
     if (locals.organization) {
         // load organization members, admins and owners
-        const organizationExpanded = await locals.pb.collection('organizations').getOne(locals.organization.id, {
+        const organizationExpanded = await locals.pb.collection<Organization>('organizations').getOne(locals.organization.id, {
             expand: 'members,admins,owner',
             fields: 'expand.members.username,expand.members.id,expand.admins.username,expand.admins.id,expand.owner.username,expand.owner.id'
         });
@@ -45,7 +47,7 @@ export const actions: Actions = {
             if (!locals.user) {
                 throw error(401, 'Unauthorized');
             }
-            const organization = await locals.pb.collection<Organization>('organizations').create({ ...formData, owner: [locals.user.id], members: [locals.user.id] });
+            const organization = await locals.pb.collection<Organization>('organizations').create({ ...formData, owner: [locals.user.id], admins: [locals.user.id], members: [locals.user.id] });
 
             if (organization) {
                 locals.organization = organization;

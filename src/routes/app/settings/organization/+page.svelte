@@ -27,9 +27,9 @@
 	import { applyAction, enhance } from '$app/forms';
 	import { getImageUrlFromPocketBase } from '$lib/utils';
 	import AppInput from '$lib/components/Input.svelte';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
-	import type { OrganizationMember } from '$lib/pulepointTypes';
+	import type { OrganizationMember } from '$lib/pulsepointTypes';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -143,7 +143,7 @@
 			</div>
 		</div>
 
-		{#if data.organization.owner === data.user?.id || data.organization.admins.includes(data.user?.id)}
+		{#if data.user?.id && (data.organization.owner === data.user.id || data.organization.admins.includes(data.user.id))}
 			<Button onclick={() => (updateOrganizationModalOpen = true)} class="w-2/4"
 				>Update Organization</Button
 			>
@@ -292,7 +292,7 @@
 											class="flex flex-row justify-end"
 										>
 											<Input type="hidden" name="userId" value={member.id} />
-											{#if data.organization.owner === data.user?.id || data.organization.admins.includes(data.user?.id)}
+											{#if data.user?.id && (data.organization.owner === data.user?.id || data.organization.admins.includes(data.user.id))}
 												<Button type="submit" class="">Remove</Button>
 											{/if}
 										</form>
@@ -334,7 +334,7 @@
 				</TabItem>
 				<TabItem title="Admins">
 					<div class="mb-6 mt-3">
-						{#if data.organization.owner === data.user?.id || data.organization.admins.includes(data.user?.id)}
+						{#if data.user?.id && (data.organization.owner === data.user?.id || data.organization.admins.includes(data.user.id))}
 							<Button onclick={() => (adminModalOpen = true)}>Add Admins</Button>
 						{/if}
 
@@ -502,7 +502,7 @@
 						switch (result.type) {
 							case 'success':
 								toast.success('Organization deleted successfully');
-								await invalidateAll();
+								await invalidate('organization');
 								break;
 							case 'error':
 								toast.error(result.error.message);
@@ -534,40 +534,30 @@
 				value={form?.data?.name}
 				errors={form?.errors?.name}
 			/>
-			<Label for="description" class="mb-2" color={form?.errors?.description ? 'red' : 'gray'}
-				>Organization Description</Label
-			>
-			<Textarea
-				id="description"
-				name="description"
-				placeholder="Your Description"
-				rows={3}
-				value={form?.data?.description}
-				color={form?.errors?.description ? 'red' : 'base'}
-			/>
-			{#if form?.errors?.description}
-				{#each form?.errors?.description as error}
-					<Helper class="mt-2" color="red">{error}</Helper>
-				{/each}
-			{/if}
+			<div>
+				<Label for="description" class="mb-2" color={form?.errors?.description ? 'red' : 'gray'}
+					>Organization Description</Label
+				>
+				<Textarea
+					id="description"
+					name="description"
+					placeholder="Your Description"
+					rows={3}
+					value={form?.data?.description}
+					color={form?.errors?.description ? 'red' : 'base'}
+				/>
+				{#if form?.errors?.description}
+					{#each form?.errors?.description as error}
+						<Helper class="mt-2" color="red">{error}</Helper>
+					{/each}
+				{/if}
+			</div>
 			<div class="flex flex-row space-x-4">
 				<div>
 					<Label for="avatar" class="pb-2">
 						<span class="label-text">Profile Picture</span>
 					</Label>
-					<Avatar
-						rounded
-						src={organizationLogo
-							? getImageUrlFromPocketBase(
-									data.organization?.collectionId ?? '',
-									data.organization?.id ?? '',
-									data.organization?.logo,
-									'36x36'
-								)
-							: ''}
-						size="xl"
-						id="organizationAvatar"
-					></Avatar>
+					<Avatar rounded src={organizationLogo ?? ''} size="xl" id="organizationAvatar"></Avatar>
 				</div>
 
 				<div class="w-2/5 self-end">

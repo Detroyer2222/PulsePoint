@@ -19,7 +19,6 @@ export const handle: Handle = async ({ event, resolve }) => {
         event.locals.user = null;
     }
 
-
     if (event.locals.user) {
         const userOrganization = await findUserOrganization(event.locals.user.id, event.locals.pb);
         if (userOrganization) {
