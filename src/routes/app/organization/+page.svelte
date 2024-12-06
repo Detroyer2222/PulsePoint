@@ -1,10 +1,8 @@
 <script lang="ts">
 	import {
-		Avatar,
 		Badge,
 		Button,
 		Card,
-		Fileupload,
 		Heading,
 		Helper,
 		Label,
@@ -22,19 +20,10 @@
 	import { toast } from 'svelte-sonner';
 	import type { Moon, Planet } from '$lib/pulsepointTypes';
 	import { PUBLIC_POCKETBASE_URL } from '$env/static/public';
+	import placeholder from '$lib/assets/outpost_placeholder.webp';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let outpostModalOpen = $state(false);
-	let outpostAvatarUrl = $state('');
-
-	const showPreview = (event: Event) => {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
-		if (file) {
-			const src = URL.createObjectURL(file);
-			outpostAvatarUrl = src;
-		}
-	};
 
 	// Client-side caches
 	const planetsCache = new Map<string, Planet[]>();
@@ -99,12 +88,7 @@
 	<Heading tag="h4" class="font-bold">Outposts:</Heading>
 	<div class="flex flex-row flex-wrap content-start justify-start gap-2">
 		{#each data?.outposts as outpost}
-			<Card
-				horizontal
-				size="sm"
-				img={getImageUrlFromPocketBase(outpost.collectionId, outpost.id, outpost.image)}
-				href="organizaton/outpost/kjgkhgkjguzgfkjhgfuzfkgh"
-			>
+			<Card horizontal size="xs" href="organizaton/outpost/kjgkhgkjguzgfkjhgfuzfkgh">
 				<div class="flex flex-col content-start justify-start gap-0.5">
 					<Heading tag="h5" class="font-bold tracking-tight text-gray-900 dark:text-white"
 						>{outpost.name}</Heading
@@ -128,7 +112,7 @@
 		<Card
 			horizontal
 			padding="md"
-			size="sm"
+			size="xs"
 			class="flex-column flex items-center justify-center gap-0.5 hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
 			onclick={() => (outpostModalOpen = true)}
 		>

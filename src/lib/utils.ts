@@ -36,7 +36,11 @@ export const toggleTheme = (isDarkMode: boolean) => {
     }
 }
 
-export const getImageUrlFromPocketBase = (collectionId: string, recordId: string, filename: string, size = '0x0'): string => {
+export const getImageUrlFromPocketBase = (collectionId: string, recordId: string, filename: string, size = '0x0'): string | null => {
+    if (!filename) {
+        return null;
+    }
+
     return `${PUBLIC_POCKETBASE_URL}/api/files/${collectionId}/${recordId}/${filename}?thumb=${size}`;
 }
 

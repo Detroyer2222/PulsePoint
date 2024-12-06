@@ -5,7 +5,6 @@ import { validateData } from '$lib/utils';
 import { addOutpostSchema } from '$lib/schemas';
 
 export const load = (async ({ locals, url }) => {
-    console.log('load');
     if (!locals.organization) {
         throw redirect(303, '/app/dashboard');
     }
