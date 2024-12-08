@@ -14,12 +14,12 @@
 		NumberInput
 	} from 'flowbite-svelte';
 	import type { ActionData, PageData } from './$types';
-	import { getImageUrlFromPocketBase } from '$lib/utils';
 	import AppInput from '$lib/components/Input.svelte';
 	import { applyAction, enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
-	import type { Moon, Planet } from '$lib/pulsepointTypes';
+	import type { Moon, Outpost, Planet } from '$lib/pulsepointTypes';
 	import { PUBLIC_POCKETBASE_URL } from '$env/static/public';
+	import { generateOutpostSlug, getImageUrlFromPocketBase } from '$lib/utils';
 	import placeholder from '$lib/assets/outpost_placeholder.webp';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -80,6 +80,11 @@
 		}
 	};
 
+	const getOupostLink = (id: string, code: string, name: string) => {
+		const slug = generateOutpostSlug(code, name);
+		return `organization/outpost/${id}/${slug}`;
+	};
+
 	let selectedMoon = $state('');
 	let advancedLocationChecked = $state(false);
 </script>
@@ -88,7 +93,7 @@
 	<Heading tag="h4" class="font-bold">Outposts:</Heading>
 	<div class="flex flex-row flex-wrap content-start justify-start gap-2">
 		{#each data?.outposts as outpost}
-			<Card horizontal size="xs" href="organizaton/outpost/kjgkhgkjguzgfkjhgfuzfkgh">
+			<Card horizontal size="xs" href={getOupostLink(outpost.id, outpost.code, outpost.name)}>
 				<div class="flex flex-col content-start justify-start gap-0.5">
 					<Heading tag="h5" class="font-bold tracking-tight text-gray-900 dark:text-white"
 						>{outpost.name}</Heading
@@ -151,13 +156,13 @@
 						name="name"
 						label="Name"
 						placeholder="Outpost Name"
-						value={form?.data?.name}
+						value={form?.data?.name as string}
 						required
 						errors={form?.errors?.name}
 					/>
 
 					<div class="space-y-2">
-						<Label class="mb-2" color={form?.data?.errors.code ? 'red' : 'gray'}
+						<Label class="mb-2" color={form?.errors?.code ? 'red' : 'gray'}
 							>Identification Code</Label
 						>
 						<Input
@@ -184,7 +189,7 @@
 							name="description"
 							placeholder="Your Description"
 							rows={3}
-							value={form?.data?.description ?? ''}
+							value={(form?.data?.description as string) ?? ''}
 							color={form?.errors?.description ? 'red' : 'base'}
 						/>
 						{#if form?.errors?.description}
@@ -253,7 +258,7 @@
 								color={form?.errors?.lat ? 'red' : 'base'}
 							/>
 							<Helper color={form?.errors?.lat ? 'red' : 'gray'}>Max 6 Decimals</Helper>
-							{#if form?.errors?.lat}
+							{#if form?.errors?.lng}
 								{#each form?.errors?.lng as error}
 									<Helper class="mt-2" color="red">{error}</Helper>
 								{/each}

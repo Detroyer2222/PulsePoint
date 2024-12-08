@@ -222,6 +222,7 @@
 		{/if}
 
 		<Heading tag="h3" class="mt-5 font-medium">Manage Members</Heading>
+		<!-- TODO: Investigate usage of svelte snippets here: https://svelte.dev/docs/svelte/snippet -->
 		<div>
 			<Tabs tabStyle="underline">
 				<TabItem title="Members" open={true}>
