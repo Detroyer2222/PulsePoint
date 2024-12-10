@@ -59,17 +59,22 @@ export const updateResources = schedules.task({
             const batch = pb.createBatch();
 
             for (const commodity of uexData.data) {
-                if (commodity.is_available_live === false || commodity.is_temporary === true || commodity.is_sellable === false) {
+                if (commodity.is_available_live === 0 || commodity.is_temporary === 1 || commodity.is_sellable === 0) {
                     logger.debug("Commodity is not relevant", { name: commodity.name });
                     continue;
                 }
 
-                if (commodity.kind == "Temporary" && commodity.price_sell == 0) {
+                if (commodity.is_temporary === 0 && commodity.price_sell == 0) {
                     logger.debug("Commodity is not relevant", { name: commodity.name });
                     continue;
                 }
 
                 if (commodity.name.toLowerCase().includes("year of the")) {
+                    logger.debug("Commodity is not relevant", { name: commodity.name });
+                    continue;
+                }
+
+                if (commodity.is_havestable === 1) {
                     logger.debug("Commodity is not relevant", { name: commodity.name });
                     continue;
                 }
