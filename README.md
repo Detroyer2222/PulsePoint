@@ -1,38 +1,83 @@
-# sv
+# PulsePoint
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+PulsePoint is an organization management platform tailored for the Star Citizen community. It aims to empower organizations to efficiently manage their outposts, track resources, assign jobs, and foster collaboration among members. This project is under active development and will evolve to include many exciting features in the future.
 
-## Creating a project
+## Features (Planned)
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Outpost Tracking**: Maintain a detailed overview of all organizational outposts across the Star Citizen universe.
+- **Resource Management**: Monitor resources at each outpost, identify shortages, and optimize logistics.
+- **Job Requests**: Set up resource or task requests that notify specific members or groups within the organization.
+- **Discord Bot Integration**: Seamlessly interact with PulsePoint through Discord, enabling real-time notifications and commands.
+- **Data Visualization**: Utilize rich graphs and charts to gain insights into your organization’s operations.
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Current Status
 
-# create a new project in my-app
-npx sv create my-app
-```
+PulsePoint is in its early stages of development. The website interface and PocketBase database are being built, and no features are functional at the moment. However, significant progress is being made to bring the vision of this tool to life.
 
-## Developing
+## Tech Stack
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+- **Frontend**: [SvelteKit](https://kit.svelte.dev/) for a modern, reactive, and fast user interface.
+- **Backend**: [PocketBase](https://pocketbase.io/) for managing data and authentication.
+- **Hosting**: Self-hosted on a VPS, managed with [Coolify](https://coolify.io/).
 
-```bash
-npm run dev
+## How to Use (Development Environment)
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+### Important currently no Contributions are accepted!
+How to develop and contribute to the project is currently a WIP. This is just a boiler plate text.
+There will be contributions accepted in the future.
 
-## Building
+To run this project locally:
 
-To create a production version of your app:
+1. Clone the repository:
 
-```bash
-npm run build
-```
+   ```bash
+   git clone https://github.com/Detroyer2222/PulsePoint.git
+   cd PulsePoint
+   ```
 
-You can preview the production build with `npm run preview`.
+2. Install dependencies for the SvelteKit frontend:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+   ```bash
+   npm install
+   ```
+
+3. Set up the PocketBase database:
+
+   - Download and set up PocketBase from [here](https://pocketbase.io/docs/).
+   - Start the PocketBase server and configure it as needed.
+
+4. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Access the app in your browser at `http://localhost:5173` (or the specified port).
+
+## Contribution Guidelines
+
+PulsePoint is an open-source project, and contributions are welcome. Here’s how you can help:
+
+1. **Report Issues**: If you encounter bugs or have feature suggestions, please open an issue on GitHub.
+2. **Contribute Code**: Fork the repository, make your changes, and submit a pull request.
+3. **Spread the Word**: Share the project with Star Citizen organizations that might benefit from it.
+
+## Roadmap
+
+- Implement basic user authentication and role management.
+- Develop the outpost tracking and resource management modules.
+- Introduce real-time notifications and job request systems.
+- Add support for more advanced organization metrics and analytics.
+
+## Acknowledgments
+
+Special thanks to the Star Citizen community for inspiring the creation of this tool. Your feedback and support will help shape PulsePoint into a valuable resource for all organizations.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+Let’s build the ultimate Star Citizen organization management tool together. Fly safe!
+
