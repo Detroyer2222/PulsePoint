@@ -4,13 +4,13 @@
  * @property {string} collectionName - The name of the collection.
  */
 export type PocketBaseType = {
-    collectionId: string;
-    collectionName: string;
-}
+	collectionId: string;
+	collectionName: string;
+};
 
 /**
  * @typedef {Object} Organization
- * 
+ *
  * @property {string} id - The unique identifier of the organization.
  * @property {string} name - The name of the organization.
  * @property {string} description - The description of the organization.
@@ -23,14 +23,14 @@ export type PocketBaseType = {
  * @property {any} expand - Additional expandable properties.
  */
 export type Organization = {
-    id: string;
-    name: string;
-    description: string;
-    logo: string;
-    owner: string;
-    admins: string[];
-    members: string[];
-    expand?: any;
+	id: string;
+	name: string;
+	description: string;
+	logo: string;
+	owner: string;
+	admins: string[];
+	members: string[];
+	expand?: any;
 } & PocketBaseType;
 
 /**
@@ -41,8 +41,8 @@ export type Organization = {
  * @extends {PocketBaseType}
  */
 export type OrganizationMember = {
-    username: string;
-    id: string;
+	username: string;
+	id: string;
 } & PocketBaseType;
 
 /**
@@ -57,12 +57,12 @@ export type OrganizationMember = {
  * @extends {PocketBaseType}
  */
 export type StarSystem = {
-    id: string;
-    name: string;
-    code: string;
-    jurisdiction: string;
-    faction: string;
-    expand?: any;
+	id: string;
+	name: string;
+	code: string;
+	jurisdiction: string;
+	faction: string;
+	expand?: any;
 } & PocketBaseType;
 
 /**
@@ -78,13 +78,13 @@ export type StarSystem = {
  * @extends {PocketBaseType}
  */
 export type Planet = {
-    id: string;
-    name: string;
-    code: string;
-    star_system: string;
-    jurisdiction: string;
-    faction: string;
-    expand?: any;
+	id: string;
+	name: string;
+	code: string;
+	star_system: string;
+	jurisdiction: string;
+	faction: string;
+	expand?: any;
 } & PocketBaseType;
 
 /**
@@ -100,13 +100,13 @@ export type Planet = {
  * @extends {PocketBaseType}
  */
 export type Moon = {
-    id: string;
-    name: string;
-    code: string;
-    planet: string;
-    jurisdiction?: string;
-    faction: string;
-    expand?: any;
+	id: string;
+	name: string;
+	code: string;
+	planet: string;
+	jurisdiction?: string;
+	faction: string;
+	expand?: any;
 } & PocketBaseType;
 
 /**
@@ -128,19 +128,19 @@ export type Moon = {
  * @extends {PocketBaseType}
  */
 export type SpaceStations = {
-    id: string;
-    name: string;
-    pad_types: string;
-    jurisdiction: string;
-    faction: string;
-    has_terminal: boolean;
-    has_refinery: boolean;
-    star_system: string;
-    planet: string;
-    moon: string;
-    orbit: string
-    is_lagrange: boolean;
-    expand: any;
+	id: string;
+	name: string;
+	pad_types: string;
+	jurisdiction: string;
+	faction: string;
+	has_terminal: boolean;
+	has_refinery: boolean;
+	star_system: string;
+	planet: string;
+	moon: string;
+	orbit: string;
+	is_lagrange: boolean;
+	expand: any;
 } & PocketBaseType;
 
 /**
@@ -149,6 +149,7 @@ export type SpaceStations = {
  * @property {string} id - The unique identifier of the outpost.
  * @property {string} name - The name of the outpost.
  * @property {string} code - A 4 character code representing the outpost.
+ * @property {string} description - The description of the outpost.
  * @property {string} image - The URL of the outpost's image.
  * @property {string} organization - The organization that owns the outpost.
  * @property {string} star_system - The star system in which the outpost is located.
@@ -161,16 +162,17 @@ export type SpaceStations = {
  * @extends {PocketBaseType}
  */
 export type Outpost = {
-    id: string;
-    name: string;
-    code: string;
-    image: string;
-    organization: string;
-    star_system: string;
-    planet: string;
-    moon: string;
-    latitude: number;
-    longitude: number;
-    space_stations: string[];
-    expand?: any;
+	id: string;
+	name: string;
+	code: string;
+	description: string;
+	image: string;
+	organization: string;
+	star_system: string;
+	planet: string;
+	moon: string;
+	latitude: number;
+	longitude: number;
+	space_stations: string[];
+	expand?: any;
 } & PocketBaseType;

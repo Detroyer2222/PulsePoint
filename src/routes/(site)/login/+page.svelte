@@ -49,7 +49,7 @@
 				label="Email"
 				name="email"
 				placeholder="name@pulsepoint.com"
-				value={form?.data?.email ?? ''}
+				value={(form?.data?.email as string) ?? ''}
 				required
 				errors={form?.errors?.email}
 				disabled={loading}

@@ -18,12 +18,10 @@
 	import { invalidateAll } from '$app/navigation';
 	import { InfoCircleSolid } from 'flowbite-svelte-icons';
 	import { toast } from 'svelte-sonner';
-	import AppInput from '$lib/components/Input.svelte';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	$inspect(data, form);
 
-	let avatarUrl = $state(data.user?.avatar);
 	let loading = $state(false);
 	const submitUpdateProfile = () => {
 		loading = true;
@@ -51,13 +49,17 @@
 		}
 	});
 
+	const handleAvatarClick = () => {
+		const avatarInput = document.getElementById('avatar') as HTMLInputElement;
+		avatarInput.click();
+	};
 	const showPreview = (event: Event) => {
 		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
-		if (file) {
-			const src = URL.createObjectURL(file);
-			const avatar = document.getElementById('userAvatar') as HTMLImageElement;
-			avatar.src = src;
+		const files = input.files;
+		if (files && files.length > 0) {
+			const src = URL.createObjectURL(files[0]);
+			const preview = document.getElementById('userAvatar') as HTMLImageElement;
+			preview.src = src;
 		}
 	};
 </script>
@@ -79,16 +81,16 @@
 					<span class="label-text">Profile Picture</span>
 				</Label>
 				<Avatar
-					src={avatarUrl
-						? getImageUrlFromPocketBase(
-								data.user?.collectionId ?? '',
-								data.user?.id ?? '',
-								data.user?.avatar,
-								'36x36'
-							)
-						: ''}
+					class="cursor-pointer"
+					src={getImageUrlFromPocketBase(
+						data.user?.collectionId ?? '',
+						data.user?.id ?? '',
+						data.user?.avatar,
+						'36x36'
+					) ?? ''}
 					size="xl"
 					id="userAvatar"
+					onclick={handleAvatarClick}
 				></Avatar>
 			</div>
 

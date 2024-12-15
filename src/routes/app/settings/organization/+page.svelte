@@ -29,20 +29,22 @@
 	import AppInput from '$lib/components/Input.svelte';
 	import { invalidate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
-	import type { OrganizationMember } from '$lib/pulsepointTypes';
+	import type { OrganizationMember, Outpost } from '$lib/pulsepointTypes';
+	import { error } from '@sveltejs/kit';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	let organizationLogo = $state(data.organization?.logo);
+	const handleOnAvatarClick = () => {
+		const avatarInput = document.getElementById('logo') as HTMLInputElement;
+		avatarInput.click();
+	};
 	const showPreview = (event: Event) => {
 		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
-		console.log('Showing preview', file);
-		if (file) {
-			const src = URL.createObjectURL(file);
-			const avatar = document.getElementById('organizationAvatar') as HTMLImageElement;
-			console.log('Avatar', avatar);
-			avatar.src = src;
+		const files = input.files;
+		if (files && files.length > 0) {
+			const src = URL.createObjectURL(files[0]);
+			const preview = document.getElementById('organizationAvatar') as HTMLImageElement;
+			preview.src = src;
 		}
 	};
 	let loading = $state(false);
@@ -111,9 +113,31 @@
 		}
 	};
 
+	let outpostDeleteModalOpen = $state(false);
+	let outposts: Outpost[] = $state(data.outposts ?? []);
+	let currentOutpostPage = $state(1);
+	let totalOutpostPages = $derived(Math.ceil(outposts.length / pageSize));
+	let currentOutpostPageData = $derived(
+		outposts.slice((currentOutpostPage - 1) * pageSize, currentOutpostPage * pageSize)
+	);
+	const nextOutpost = () => {
+		if (currentOutpostPage < totalOutpostPages) {
+			currentOutpostPage++;
+		}
+	};
+	const previousOutpost = () => {
+		if (currentOutpostPage > 1) {
+			currentOutpostPage--;
+		}
+	};
+	const outpostPageClicked = (page: number) => {
+		currentOutpostPage = page;
+	};
+
 	$effect(() => {
 		members = data.organization?.expand.members ?? [];
 		admins = data.organization?.expand.admins ?? [];
+		outposts = data.outposts ?? [];
 	});
 </script>
 
@@ -123,14 +147,12 @@
 		<div class="flex flex-row items-start gap-x-6">
 			<Avatar
 				rounded
-				src={organizationLogo
-					? getImageUrlFromPocketBase(
-							data.organization?.collectionId ?? '',
-							data.organization?.id ?? '',
-							data.organization?.logo,
-							'36x36'
-						)
-					: ''}
+				src={getImageUrlFromPocketBase(
+					data.organization?.collectionId ?? '',
+					data.organization?.id ?? '',
+					data.organization?.logo,
+					'36x36'
+				) ?? ''}
 				size="xl"
 			/>
 			<div class="flex flex-col">
@@ -200,6 +222,19 @@
 						<Label class="pb-2" color={form?.errors?.logo ? 'red' : 'gray'}
 							>Upload Organization Logo</Label
 						>
+						<Avatar
+							id="organizationAvatar"
+							class="mb-2 cursor-pointer"
+							rounded
+							src={getImageUrlFromPocketBase(
+								data.organization?.collectionId ?? '',
+								data.organization?.id ?? '',
+								data.organization?.logo,
+								'36x36'
+							) ?? ''}
+							size="xl"
+							onclick={handleOnAvatarClick}
+						/>
 						<Fileupload
 							id="logo"
 							name="logo"
@@ -294,7 +329,7 @@
 										>
 											<Input type="hidden" name="userId" value={member.id} />
 											{#if data.user?.id && (data.organization.owner === data.user?.id || data.organization.admins.includes(data.user.id))}
-												<Button type="submit" class="">Remove</Button>
+												<Button type="submit" color="red">Remove</Button>
 											{/if}
 										</form>
 									</TableBodyCell>
@@ -436,7 +471,7 @@
 										>
 											<Input type="hidden" name="userId" value={member.id} />
 											{#if data.organization.owner === data.user?.id}
-												<Button type="submit" class="">Remove</Button>
+												<Button type="submit" color="red">Remove</Button>
 											{/if}
 										</form>
 									</TableBodyCell>
@@ -487,6 +522,114 @@
 							</TableBodyRow>
 						</TableBody>
 					</Table>
+				</TabItem>
+
+				<TabItem title="Outposts">
+					<Table hoverable={true}>
+						<TableHead>
+							<TableHeadCell>Code</TableHeadCell>
+							<TableHeadCell>Name</TableHeadCell>
+							<TableHeadCell><span class="sr-only">Remove</span></TableHeadCell>
+						</TableHead>
+						<TableBody>
+							{#each currentOutpostPageData as outpost}
+								<TableBodyRow>
+									<TableBodyCell>{outpost.code}</TableBodyCell>
+									<TableBodyCell>{outpost.name}</TableBodyCell>
+									<TableBodyCell>
+										<div class="flex flex-row justify-end">
+											{#if data.user?.id && data.organization.admins.includes(data?.user.id)}
+												<Button color="red" onclick={() => (outpostDeleteModalOpen = true)}
+													>Delete</Button
+												>
+											{/if}
+										</div>
+										<Modal
+											bind:open={outpostDeleteModalOpen}
+											autoclose={false}
+											size="md"
+											color="red"
+											title="Do you really want to delete this outpost?"
+										>
+											<form
+												method="post"
+												action="?/removeOutpost"
+												use:enhance={() => {
+													return async ({ result, update }) => {
+														switch (result.type) {
+															case 'success':
+																toast.success('Outpost deleted successfully');
+																await update();
+																break;
+															case 'failure':
+																toast.error('Failed to delete outpost');
+																break;
+															case 'error':
+																toast.error(result.error.message);
+																break;
+															default:
+																await applyAction(result);
+														}
+													};
+												}}
+												class="flex flex-col space-y-6"
+											>
+												<div class="text-base leading-relaxed">Deleting this outpost means:</div>
+												<ul class="list-inside list-disc">
+													<li class="text-wrap text-base leading-relaxed">
+														All commodities this outpost was tracking will be deleted.
+													</li>
+													<li class="text-wrap text-base leading-relaxed">
+														All commodity history will be deleted. This affects commodity history
+														when loking at the organization history.
+													</li>
+												</ul>
+												<Input type="hidden" name="outpostId" value={outpost.id} />
+												<div class="flex flex-row justify-between">
+													<Button type="submit" color="red">Confirm Remove</Button>
+													<Button
+														type="button"
+														color="alternative"
+														on:click={() => (outpostDeleteModalOpen = false)}>Cancel</Button
+													>
+												</div>
+											</form>
+										</Modal>
+									</TableBodyCell>
+								</TableBodyRow>
+							{/each}
+						</TableBody>
+					</Table>
+					<div class="flex w-full flex-row items-end justify-between">
+						<Label>
+							Page Size
+							<Select class="mt-2" items={pageSizes} bind:value={pageSize} />
+						</Label>
+
+						<div class="mt-3">
+							<ButtonGroup>
+								<Button
+									outline
+									disabled={currentOutpostPage == 1 ? true : false}
+									onclick={previousOutpost}>Previous</Button
+								>
+								{#each Array(totalOutpostPages)
+									.fill(0)
+									.map((_, i) => i + 1) as num}
+									<Button
+										outline
+										disabled={currentOutpostPage == num ? true : false}
+										onclick={() => outpostPageClicked(num)}>{num}</Button
+									>
+								{/each}
+								<Button
+									outline
+									disabled={currentOutpostPage == totalOutpostPages ? true : false}
+									onclick={nextOutpost}>Next</Button
+								>
+							</ButtonGroup>
+						</div>
+					</div>
 				</TabItem>
 			</Tabs>
 		</div>

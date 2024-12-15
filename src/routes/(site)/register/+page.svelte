@@ -16,7 +16,7 @@
 				label="Username"
 				name="username"
 				placeholder="Username"
-				value={form?.data?.username ?? ''}
+				value={(form?.data?.username as string) ?? ''}
 				required
 				errors={form?.errors?.username}
 			/>
@@ -25,7 +25,7 @@
 				label="Email"
 				name="email"
 				placeholder="name@pulsepoint.com"
-				value={form?.data?.email ?? ''}
+				value={(form?.data?.email as string) ?? ''}
 				required
 				errors={form?.errors?.email}
 			/>
@@ -34,7 +34,7 @@
 				label="Password"
 				name="password"
 				placeholder="•••••"
-				value={form?.data?.password ?? ''}
+				value={(form?.data?.password as string) ?? ''}
 				required
 				errors={form?.errors?.password}
 			/>
@@ -43,7 +43,7 @@
 				label="Confirm Password"
 				name="passwordConfirm"
 				placeholder="•••••"
-				value={form?.data?.passwordConfirm ?? ''}
+				value={(form?.data?.passwordConfirm as string) ?? ''}
 				required
 				errors={form?.errors?.passwordConfirm}
 			/>

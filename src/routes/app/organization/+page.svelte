@@ -11,7 +11,8 @@
 		Select,
 		Textarea,
 		Toggle,
-		NumberInput
+		NumberInput,
+		Popover
 	} from 'flowbite-svelte';
 	import type { ActionData, PageData } from './$types';
 	import AppInput from '$lib/components/Input.svelte';
@@ -20,7 +21,6 @@
 	import type { Moon, Outpost, Planet } from '$lib/pulsepointTypes';
 	import { PUBLIC_POCKETBASE_URL } from '$env/static/public';
 	import { generateOutpostSlug, getImageUrlFromPocketBase } from '$lib/utils';
-	import placeholder from '$lib/assets/outpost_placeholder.webp';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 	let outpostModalOpen = $state(false);
@@ -101,13 +101,22 @@
 					<Heading tag="h6" class="color-primary text-sm">{outpost.code}</Heading>
 					<div class="flex flex-row content-center justify-start gap-2">
 						{#if outpost.expand.star_system}
-							<Badge large rounded color="indigo">{outpost.expand.star_system.name}</Badge>
+							<Badge large rounded color="indigo" id="star_system" class="cursor-default"
+								>{outpost.expand.star_system.name}</Badge
+							>
+							<Popover triggeredBy="#star_system" trigger="hover">Star System</Popover>
 						{/if}
 						{#if outpost.expand.planet}
-							<Badge large rounded color="purple">{outpost.expand.planet.name}</Badge>
+							<Badge large rounded color="purple" id="planet" class="cursor-default"
+								>{outpost.expand.planet.name}</Badge
+							>
+							<Popover triggeredBy="#planet" trigger="hover">Planet</Popover>
 						{/if}
 						{#if outpost.expand.moon}
-							<Badge large rounded color="pink">{outpost.expand.moon.name}</Badge>
+							<Badge large rounded color="pink" id="moon" class="cursor-default"
+								>{outpost.expand.moon.name}</Badge
+							>
+							<Popover triggeredBy="#moon" trigger="hover">Moon</Popover>
 						{/if}
 					</div>
 				</div>
@@ -126,7 +135,7 @@
 				class="w-full text-center font-bold tracking-tight text-primary-900 dark:text-primary-500"
 				>Add Outpost</Heading
 			>
-			<Modal bind:open={outpostModalOpen} size="xs" autoclose class="w-full">
+			<Modal bind:open={outpostModalOpen} size="xs" class="w-full">
 				<form
 					action="?/addOutpost"
 					class="flex flex-col space-y-6"
@@ -136,6 +145,7 @@
 							switch (result.type) {
 								case 'success':
 									toast.success('Outpost added');
+									outpostModalOpen = false;
 									await update();
 									break;
 								case 'failure':

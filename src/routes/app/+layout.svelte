@@ -19,11 +19,11 @@
 
 	let avatarUrl = $state(data.user?.avatar);
 	let isDarkMode = $state(true);
-	
+
 	function toggleDarkMode() {
-        isDarkMode = !isDarkMode;
+		isDarkMode = !isDarkMode;
 		toggleTheme(isDarkMode);
-    }
+	}
 </script>
 
 <Navbar>
@@ -34,9 +34,18 @@
 		>
 	</NavBrand>
 	<div class="flex items-center md:order-2">
-		<Avatar src={avatarUrl 
-			? getImageUrlFromPocketBase(data.user?.collectionId ?? '', data.user?.id ?? '', data.user?.avatar, "36x36") 
-			: "" } id="avatar-menu" class="cursor-pointer" />
+		<Avatar
+			src={avatarUrl
+				? getImageUrlFromPocketBase(
+						data.user?.collectionId ?? '',
+						data.user?.id ?? '',
+						data.user?.avatar,
+						'36x36'
+					)
+				: ''}
+			id="avatar-menu"
+			class="cursor-pointer"
+		/>
 		<NavHamburger />
 	</div>
 	<Dropdown placement="bottom" triggeredBy="#avatar-menu">
@@ -49,9 +58,9 @@
 		<DropdownDivider />
 		<DropdownItem onclick={toggleDarkMode}>
 			{#if isDarkMode}
-				  Light Mode
+				Light Mode
 			{:else}
-				  Dark Mode
+				Dark Mode
 			{/if}
 		</DropdownItem>
 		<DropdownDivider />
