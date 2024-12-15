@@ -75,7 +75,7 @@ Special thanks to the Star Citizen community for inspiring the creation of this 
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GNU Affero General Public License](LICENSE).
 
 ---
 
