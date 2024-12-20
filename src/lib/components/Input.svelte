@@ -2,7 +2,7 @@
 	// @ts-nocheck
 	import { Label, Input, Helper } from 'flowbite-svelte';
 
-	let {
+	const {
 		type,
 		label,
 		name,
@@ -14,8 +14,8 @@
 	} = $props();
 </script>
 
-<div>
-	<Label class="mb-2" color={errors ? 'red' : 'gray'}>{label}</Label>
+<div class="flex flex-col space-y-2">
+	<Label color={errors ? 'red' : 'gray'}>{label}</Label>
 	<Input
 		{type}
 		{name}
@@ -27,7 +27,7 @@
 	/>
 	{#if errors}
 		{#each errors as error}
-			<Helper class="mt-2" color="red">{error}</Helper>
+			<Helper color="red">{error}</Helper>
 		{/each}
 	{/if}
 </div>

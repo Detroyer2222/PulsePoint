@@ -208,7 +208,7 @@ export const addOutpostSchema = z.object({
 		.number()
 		.min(-90, { message: 'Latitude must be between -90 and 90' })
 		.max(90, { message: 'Latitude must be between -90 and 90' })
-		.refine((val) => /^\-?\d+(\.\d{1,6})?$/.test(val.toFixed(6)), {
+		.refine((val) => /^-?\d+(\.\d{1,6})?$/.test(val.toFixed(6)), {
 			message: 'Latitude must have at most 6 decimal places'
 		})
 		.optional(),
@@ -216,7 +216,7 @@ export const addOutpostSchema = z.object({
 		.number()
 		.min(-180, { message: 'Longitude must be between -180 and 180' })
 		.max(180, { message: 'Longitude must be between -180 and 180' })
-		.refine((val) => /^\-?\d+(\.\d{1,6})?$/.test(val.toFixed(6)), {
+		.refine((val) => /^-?\d+(\.\d{1,6})?$/.test(val.toFixed(6)), {
 			message: 'Longitude must have at most 6 decimal places'
 		})
 		.optional()
@@ -261,4 +261,13 @@ export const updateOutpostSchema = z.object({
 
 export const removeOutpostSchema = z.object({
 	outpostId: z.string({ required_error: 'Outpost ID is required' })
+});
+
+export const requestCommoditySchema = z.object({
+	outpostId: z.string({ required_error: 'Outpost ID is required' }),
+	commodityId: z.string({ required_error: 'Commodity ID is required' }),
+	quantity: z
+		.string()
+		.transform((val) => Number(`${val}`.replace(',', '.')))
+		.pipe(z.number().positive({ message: 'Quantity must be larger than 0' }))
 });
