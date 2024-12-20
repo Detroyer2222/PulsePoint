@@ -65,9 +65,5 @@ export const actions: Actions = {
 				throw error(500, 'Unknown error');
 			}
 		}
-
-		return {
-			success: true
-		};
 	}
 };

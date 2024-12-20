@@ -100,21 +100,21 @@
 					>
 					<Heading tag="h6" class="color-primary text-sm">{outpost.code}</Heading>
 					<div class="flex flex-row content-center justify-start gap-2">
-						{#if outpost.expand.star_system}
+						{#if outpost.expand?.star_system}
 							<Badge large rounded color="indigo" id="star_system" class="cursor-default"
-								>{outpost.expand.star_system.name}</Badge
+								>{outpost.expand?.star_system.name}</Badge
 							>
 							<Popover triggeredBy="#star_system" trigger="hover">Star System</Popover>
 						{/if}
-						{#if outpost.expand.planet}
+						{#if outpost.expand?.planet}
 							<Badge large rounded color="purple" id="planet" class="cursor-default"
-								>{outpost.expand.planet.name}</Badge
+								>{outpost.expand?.planet.name}</Badge
 							>
 							<Popover triggeredBy="#planet" trigger="hover">Planet</Popover>
 						{/if}
-						{#if outpost.expand.moon}
+						{#if outpost.expand?.moon}
 							<Badge large rounded color="pink" id="moon" class="cursor-default"
-								>{outpost.expand.moon.name}</Badge
+								>{outpost.expand?.moon.name}</Badge
 							>
 							<Popover triggeredBy="#moon" trigger="hover">Moon</Popover>
 						{/if}
