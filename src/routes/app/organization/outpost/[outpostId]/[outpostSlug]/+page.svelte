@@ -9,9 +9,16 @@
 		Input,
 		Label,
 		Modal,
+		NumberInput,
 		P,
 		Popover,
-		Span,
+		Select,
+		Table,
+		TableBody,
+		TableBodyCell,
+		TableBodyRow,
+		TableHead,
+		TableHeadCell,
 		Textarea
 	} from 'flowbite-svelte';
 	import type { ActionData, PageData } from './$types';
@@ -20,10 +27,11 @@
 	import AppInput from '$lib/components/Input.svelte';
 	import { applyAction, enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import type { OutpostCommodity } from '$lib/pulsepointTypes';
+	import BadgeFilter from '$lib/components/BadgeFilter.svelte';
+	import { ArrowDownOutline, ArrowUpDownOutline, ArrowUpOutline } from 'flowbite-svelte-icons';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
-
-	let outpostImage = $state(data.outpost.image);
 
 	let imageChanged = $state(false);
 	let inputImage = $state<FileList | undefined>(undefined);
@@ -49,6 +57,64 @@
 	};
 
 	let updateOutpostModalOpen = $state(false);
+
+	const outpostCommodities = $state<OutpostCommodity[]>(data.outpostCommodities);
+	let selectedFilter = $state<string[]>([]);
+	const filteredCommodities = $derived<OutpostCommodity[]>(
+		outpostCommodities.filter(
+			(commodity) =>
+				selectedFilter.length === 0 ||
+				(commodity?.expand?.commodity?.type &&
+					selectedFilter.includes(commodity.expand.commodity.type))
+		)
+	);
+
+	let commoditySorting = $state({ column: 'commodity', direction: 'asc' });
+
+	const toggleSorting = (column: string) => {
+		if (commoditySorting.column === column) {
+			commoditySorting.direction = commoditySorting.direction === 'asc' ? 'desc' : 'asc';
+		} else {
+			commoditySorting.column = column;
+			commoditySorting.direction = 'asc';
+		}
+	};
+
+	let sortedCommodities = $derived<OutpostCommodity[]>(
+		filteredCommodities.toSorted((a, b) => {
+			const { column, direction } = commoditySorting;
+			const multiplier = direction === 'asc' ? 1 : -1;
+
+			switch (column) {
+				case 'commodity':
+					if (a.expand?.commodity?.name && b.expand?.commodity?.name) {
+						return multiplier * a.expand.commodity.name.localeCompare(b.expand.commodity.name);
+					}
+					return 0;
+
+				case 'type':
+					if (a.expand?.commodity?.type && b.expand?.commodity?.type) {
+						return multiplier * a.expand.commodity.type.localeCompare(b.expand.commodity.type);
+					}
+					return 0;
+
+				case 'quantity':
+					return multiplier * a.quantity - b.quantity;
+				default:
+					return 0;
+			}
+		})
+	);
+
+	let requestCommodityModalOpen = $state(false);
+	let selectedCommodity = $state<string>('');
+
+	const onCommodityRequestedClicked = (commodityId: string) => {
+		selectedCommodity = commodityId;
+		requestCommodityModalOpen = true;
+	};
+
+	$inspect(data.outpostCommodities);
 </script>
 
 <div class="flex h-full w-full flex-col space-y-6 px-8 pt-4">
@@ -137,19 +203,19 @@
 
 			<div class="p-5">
 				<div class="flex flex-row content-center justify-start gap-2">
-					{#if data.outpost.expand.star_system}
+					{#if data.outpost?.expand?.star_system}
 						<Badge large rounded color="indigo" id="star_system" class="cursor-default">
 							{data.outpost.expand.star_system.name}
 						</Badge>
 						<Popover triggeredBy="#star_system" trigger="hover">Star System</Popover>
 					{/if}
-					{#if data.outpost.expand.planet}
+					{#if data.outpost?.expand?.planet}
 						<Badge large rounded color="purple" id="planet" class="cursor-default">
 							{data.outpost.expand.planet.name}
 						</Badge>
 						<Popover triggeredBy="#planet" trigger="hover">Planet</Popover>
 					{/if}
-					{#if data.outpost.expand.moon}
+					{#if data.outpost?.expand?.moon}
 						<Badge large rounded color="pink" id="moon" class="cursor-default">
 							{data.outpost.expand.moon.name}
 						</Badge>
@@ -213,4 +279,167 @@
 			</div>
 		</Modal>
 	</form>
+
+	<Heading tag="h3">Commodities</Heading>
+	<div class="flex flex-row flex-wrap gap-2">
+		<BadgeFilter
+			filters={data.commodityTypes.map((f) => f.name)}
+			bind:selectedFilters={selectedFilter}
+		></BadgeFilter>
+	</div>
+	<div class="space-between flex flex-row">
+		<Table shadow noborder={true} hoverable={true} striped={true}>
+			<TableHead>
+				<!-- Sort by Commodity Name -->
+				<!-- Sort by Commodity Name -->
+				<TableHeadCell class="cursor-pointer" onclick={() => toggleSorting('commodity')}>
+					<div class="flex flex-row space-x-1">
+						Commodity
+						{#if commoditySorting.column === 'commodity'}
+							{#if commoditySorting.direction === 'asc'}
+								<ArrowUpOutline />
+							{:else}
+								<ArrowDownOutline />
+							{/if}
+						{:else}
+							<ArrowUpDownOutline />
+						{/if}
+					</div>
+				</TableHeadCell>
+
+				<!-- Sort by Type -->
+				<TableHeadCell class="cursor-pointer" onclick={() => toggleSorting('type')}>
+					<div class="flex flex-row space-x-1">
+						Type
+						{#if commoditySorting.column === 'type'}
+							{#if commoditySorting.direction === 'asc'}
+								<ArrowUpOutline />
+							{:else}
+								<ArrowDownOutline />
+							{/if}
+						{:else}
+							<ArrowUpDownOutline />
+						{/if}
+					</div>
+				</TableHeadCell>
+
+				<!-- Sort by Amount -->
+				<TableHeadCell class="cursor-pointer" onclick={() => toggleSorting('quantity')}>
+					<div class="flex flex-row space-x-1">
+						Quantity
+						{#if commoditySorting.column === 'quantity'}
+							{#if commoditySorting.direction === 'asc'}
+								<ArrowUpOutline />
+							{:else}
+								<ArrowDownOutline />
+							{/if}
+						{:else}
+							<ArrowUpDownOutline />
+						{/if}
+					</div>
+				</TableHeadCell>
+				<TableHeadCell>Incoming/Outgoing</TableHeadCell>
+				<TableHeadCell><sr-only>Request</sr-only></TableHeadCell>
+			</TableHead>
+			<TableBody tableBodyClass="divide-y">
+				{#each sortedCommodities as outpostCommodity}
+					<TableBodyRow>
+						<TableBodyCell>{outpostCommodity.expand?.commodity?.name}</TableBodyCell>
+						<TableBodyCell>{outpostCommodity.expand?.commodity?.type}</TableBodyCell>
+						<TableBodyCell>{outpostCommodity.quantity}</TableBodyCell>
+						<TableBodyCell>Change</TableBodyCell>
+						<TableBodyCell>
+							<Button
+								onclick={() => {
+									const id = outpostCommodity.expand?.commodity?.id;
+									if (id) onCommodityRequestedClicked(id);
+								}}>Request</Button
+							>
+						</TableBodyCell>
+					</TableBodyRow>
+				{/each}
+			</TableBody>
+			<tfoot>
+				<tr class="font-semibold text-gray-900 dark:text-white">
+					<th scope="row" class="px-6 py-3 text-base">Total</th>
+					<td class="px-6 py-3"></td>
+					<td class="px-6 py-3">
+						{#if outpostCommodities.length > 0}
+							{outpostCommodities.reduce((acc, cur) => acc + cur.quantity, 0)}
+						{/if}
+					</td>
+				</tr>
+			</tfoot>
+		</Table>
+		<Modal
+			bind:open={requestCommodityModalOpen}
+			size="xs"
+			autoclose={false}
+			class="w-full"
+			title="Request Commodity"
+		>
+			<form
+				method="post"
+				action="?/requestCommodity"
+				enctype="multipart/form-data"
+				class="flex flex-col space-y-6"
+				use:enhance={() => {
+					return async ({ result, update }) => {
+						switch (result.type) {
+							case 'success':
+								toast.success('Job Created');
+								requestCommodityModalOpen = false;
+								await update();
+								break;
+							case 'failure':
+								toast.error('Failed to create job');
+								break;
+							case 'error':
+								toast.error(result.error.message);
+								break;
+							default:
+								await applyAction(result);
+						}
+					};
+				}}
+			>
+				<input type="hidden" name="outpostId" value={data.outpost.id} />
+
+				<div class="space-y-2">
+					<Label>Commodity</Label>
+					<Select
+						name="commodityId"
+						placeholder="Select Commodity..."
+						required
+						bind:value={selectedCommodity}
+					>
+						{#each outpostCommodities as outpostCommodity}
+							<option value={outpostCommodity.expand?.commodity?.id}
+								>{outpostCommodity.expand?.commodity?.name}</option
+							>
+						{/each}
+					</Select>
+				</div>
+
+				<div class="flex flex-col space-y-2">
+					<Label color={form?.errors?.quantity ? 'red' : 'gray'}>Amount</Label>
+					<Input
+						name="quantity"
+						type="text"
+						placeholder="SCU"
+						value={form?.data?.quantity}
+						required
+						color={form?.errors?.quantity ? 'red' : 'base'}
+					/>
+					{#if form?.errors?.quantity}
+						{#each form?.errors?.quantity as error}
+							<Helper color="red">{error}</Helper>
+						{/each}
+					{/if}
+				</div>
+
+				<Button type="submit">Request Commodity</Button>
+			</form>
+		</Modal>
+	</div>
 </div>
