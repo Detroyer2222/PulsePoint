@@ -31,7 +31,7 @@
 	import BadgeFilter from '$lib/components/BadgeFilter.svelte';
 	import { ArrowDownOutline, ArrowUpDownOutline, ArrowUpOutline } from 'flowbite-svelte-icons';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	const { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let imageChanged = $state(false);
 	let inputImage = $state<FileList | undefined>(undefined);
@@ -69,7 +69,7 @@
 		)
 	);
 
-	let commoditySorting = $state({ column: 'commodity', direction: 'asc' });
+	const commoditySorting = $state({ column: 'commodity', direction: 'asc' });
 
 	const toggleSorting = (column: string) => {
 		if (commoditySorting.column === column) {
@@ -80,7 +80,7 @@
 		}
 	};
 
-	let sortedCommodities = $derived<OutpostCommodity[]>(
+	const sortedCommodities = $derived<OutpostCommodity[]>(
 		filteredCommodities.toSorted((a, b) => {
 			const { column, direction } = commoditySorting;
 			const multiplier = direction === 'asc' ? 1 : -1;
